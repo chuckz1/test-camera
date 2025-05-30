@@ -25,6 +25,9 @@ async function startWebRTC(stream) {
 		if (!event.candidate) {
 			// Show the full SDP in the localSDP textarea (compressed and chunked)
 			window.displayPagedSDP(JSON.stringify(pc.localDescription));
+			if (window.updateQRCodeWithCurrentChunk) {
+				window.updateQRCodeWithCurrentChunk();
+			}
 		}
 	};
 	const offer = await pc.createOffer();
@@ -111,30 +114,34 @@ function displayPagedSDP(sdp) {
 
 window.showPrevSDP = function () {
 	if (!window.sdpChunks || window.sdpChunks.length < 2) return;
-	sdpCurrentIdx =
-		(sdpCurrentIdx - 1 + window.sdpChunks.length) % window.sdpChunks.length;
+	window.sdpCurrentIdx =
+		(window.sdpCurrentIdx - 1 + window.sdpChunks.length) % window.sdpChunks.length;
 	const localSDP = document.getElementById("localSDP");
-	if (localSDP) localSDP.value = window.sdpChunks[sdpCurrentIdx];
+	if (localSDP) localSDP.value = window.sdpChunks[window.sdpCurrentIdx];
 	const nav = document.getElementById("sdpNav");
 	const indexSpan = document.getElementById("sdpIndex");
 	if (nav && indexSpan) {
-		indexSpan.textContent = `Page ${sdpCurrentIdx + 1} of ${
-			window.sdpChunks.length
-		}`;
+		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${window.sdpChunks.length}`;
+	}
+	if (window.updateQRCodeWithCurrentChunk) {
+		console.log("[QR] showPrevSDP triggers QR update");
+		window.updateQRCodeWithCurrentChunk();
 	}
 };
 
 window.showNextSDP = function () {
 	if (!window.sdpChunks || window.sdpChunks.length < 2) return;
-	sdpCurrentIdx = (sdpCurrentIdx + 1) % window.sdpChunks.length;
+	window.sdpCurrentIdx = (window.sdpCurrentIdx + 1) % window.sdpChunks.length;
 	const localSDP = document.getElementById("localSDP");
-	if (localSDP) localSDP.value = window.sdpChunks[sdpCurrentIdx];
+	if (localSDP) localSDP.value = window.sdpChunks[window.sdpCurrentIdx];
 	const nav = document.getElementById("sdpNav");
 	const indexSpan = document.getElementById("sdpIndex");
 	if (nav && indexSpan) {
-		indexSpan.textContent = `Page ${sdpCurrentIdx + 1} of ${
-			window.sdpChunks.length
-		}`;
+		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${window.sdpChunks.length}`;
+	}
+	if (window.updateQRCodeWithCurrentChunk) {
+		console.log("[QR] showNextSDP triggers QR update");
+		window.updateQRCodeWithCurrentChunk();
 	}
 };
 

@@ -37,6 +37,10 @@ function showSDPChunk(idx) {
 		nav.style.display = window.sdpChunks.length > 1 ? "" : "none";
 		indexSpan.textContent = `Page ${idx + 1} of ${window.sdpChunks.length}`;
 	}
+	console.log("[QR] showSDPChunk triggers QR update");
+	if (window.updateQRCodeWithCurrentChunk) {
+		window.updateQRCodeWithCurrentChunk();
+	}
 }
 
 window.showPrevSDP = function () {
