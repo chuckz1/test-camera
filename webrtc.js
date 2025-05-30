@@ -6,7 +6,9 @@ let sdpChunks = [];
 let sdpCurrentIdx = 0;
 
 function setupPeerConnection() {
-	peerConnection = new RTCPeerConnection();
+	peerConnection = new RTCPeerConnection({
+		iceCandidatePoolSize: 0, // Ensures ICE candidates are collected before offer is sent
+	});
 
 	peerConnection.ontrack = (event) => {
 		let video = document.getElementById("video");
@@ -21,17 +23,28 @@ function setupPeerConnection() {
 async function startWebRTC(stream) {
 	const pc = setupPeerConnection();
 	stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-	pc.onicecandidate = (event) => {
-		if (!event.candidate) {
-			// Show the full SDP in the localSDP textarea (compressed and chunked)
-			window.displayPagedSDP(JSON.stringify(pc.localDescription));
-			if (window.updateQRCodeWithCurrentChunk) {
-				window.updateQRCodeWithCurrentChunk();
+	
+	// Create a Promise that resolves when ICE gathering is complete
+	const iceGatheringComplete = new Promise((resolve) => {
+		pc.onicecandidate = (event) => {
+			if (!event.candidate) {
+				resolve();
 			}
-		}
-	};
+		};
+	});
+	
 	const offer = await pc.createOffer();
 	await pc.setLocalDescription(offer);
+	
+	// Wait for ICE gathering to complete
+	await iceGatheringComplete;
+	
+	// Now that all ICE candidates have been collected, display the final SDP
+	window.displayPagedSDP(JSON.stringify(pc.localDescription));
+	if (window.updateQRCodeWithCurrentChunk) {
+		window.updateQRCodeWithCurrentChunk();
+	}
+	
 	console.log("Full Offer SDP:", JSON.stringify(pc.localDescription));
 }
 
@@ -115,13 +128,16 @@ function displayPagedSDP(sdp) {
 window.showPrevSDP = function () {
 	if (!window.sdpChunks || window.sdpChunks.length < 2) return;
 	window.sdpCurrentIdx =
-		(window.sdpCurrentIdx - 1 + window.sdpChunks.length) % window.sdpChunks.length;
+		(window.sdpCurrentIdx - 1 + window.sdpChunks.length) %
+		window.sdpChunks.length;
 	const localSDP = document.getElementById("localSDP");
 	if (localSDP) localSDP.value = window.sdpChunks[window.sdpCurrentIdx];
 	const nav = document.getElementById("sdpNav");
 	const indexSpan = document.getElementById("sdpIndex");
 	if (nav && indexSpan) {
-		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${window.sdpChunks.length}`;
+		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${
+			window.sdpChunks.length
+		}`;
 	}
 	if (window.updateQRCodeWithCurrentChunk) {
 		console.log("[QR] showPrevSDP triggers QR update");
@@ -137,7 +153,9 @@ window.showNextSDP = function () {
 	const nav = document.getElementById("sdpNav");
 	const indexSpan = document.getElementById("sdpIndex");
 	if (nav && indexSpan) {
-		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${window.sdpChunks.length}`;
+		indexSpan.textContent = `Page ${window.sdpCurrentIdx + 1} of ${
+			window.sdpChunks.length
+		}`;
 	}
 	if (window.updateQRCodeWithCurrentChunk) {
 		console.log("[QR] showNextSDP triggers QR update");
