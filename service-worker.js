@@ -2,8 +2,8 @@ const CACHE_NAME = "arducam-camera-pwa-v1";
 const URLS_TO_CACHE = [
 	"./camera.html",
 	"./manifest.json",
-	"./icon-192.png",
-	"./icon-512.png",
+	"./circle.png",
+	"./triangle.png",
 ];
 
 self.addEventListener("install", (event) => {
