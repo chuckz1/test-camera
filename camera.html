@@ -18,7 +18,22 @@
 	<video id="video" autoplay playsinline style="width: 640px; max-width: 100%;"></video>
 	<br>
 	<button id="startCamera">Start Camera</button>
+	<hr>
+	<h2>WebRTC</h2>
+	<button id="startWebRTC">Start WebRTC</button>
+	<div style="margin:10px 0;">
+		<label for="localSDP">Your Offer/Answer:</label><br>
+		<textarea id="localSDP" rows="6" cols="60" readonly></textarea>
+	</div>
+	<div style="margin:10px 0;">
+		<label for="remoteSDP">Paste Remote Offer/Answer:</label><br>
+		<textarea id="remoteSDP" rows="6" cols="60"></textarea>
+		<br>
+		<button id="setRemoteSDP">Set Remote Description</button>
+	</div>
 	<script src="camera.js"></script>
+	<script src="webrtc.js"></script>
+	<script src="main.js"></script>
 </body>
 
 </html>
