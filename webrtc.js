@@ -23,7 +23,7 @@ function setupPeerConnection() {
 async function startWebRTC(stream) {
 	const pc = setupPeerConnection();
 	stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-	
+
 	// Create a Promise that resolves when ICE gathering is complete
 	const iceGatheringComplete = new Promise((resolve) => {
 		pc.onicecandidate = (event) => {
@@ -32,25 +32,29 @@ async function startWebRTC(stream) {
 			}
 		};
 	});
-	
+
 	const offer = await pc.createOffer();
 	await pc.setLocalDescription(offer);
-	
+
 	// Wait for ICE gathering to complete
 	await iceGatheringComplete;
-	
+
 	// Now that all ICE candidates have been collected, display the final SDP
 	window.displayPagedSDP(JSON.stringify(pc.localDescription));
 	if (window.updateQRCodeWithCurrentChunk) {
 		window.updateQRCodeWithCurrentChunk();
 	}
-	
+
 	console.log("Full Offer SDP:", JSON.stringify(pc.localDescription));
 }
 
 async function setRemoteDescription() {
 	const remoteSdpElem = document.getElementById("remoteSDP");
 	let sdpText = remoteSdpElem.value;
+
+	// clear the textarea to avoid reprocessing
+	remoteSdpElem.value = "";
+
 	if (!peerConnection) setupPeerConnection();
 
 	// Handle chunked input and show chunk status
@@ -78,6 +82,9 @@ async function setRemoteDescription() {
 			return; // Wait for more chunks
 		}
 	}
+
+	// final parsing - all chunks received
+
 	try {
 		const desc = JSON.parse(descText);
 		await peerConnection.setRemoteDescription(new RTCSessionDescription(desc));
