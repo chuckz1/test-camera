@@ -39,15 +39,15 @@ window.addEventListener("DOMContentLoaded", () => {
 	if (sdpNext)
 		sdpNext.onclick = () => window.showNextSDP && window.showNextSDP();
 
-	// Accept chunked or full SDP in remoteSDP
-	const remoteSDP = document.getElementById("remoteSDP");
-	if (remoteSDP) {
-		remoteSDP.addEventListener("input", function () {
-			const val = this.value.trim();
-			const sdp = window.parseSDPChunk(val);
-			if (sdp) {
-				this.value = sdp;
-			}
-		});
-	}
+	// // Accept chunked or full SDP in remoteSDP
+	// const remoteSDP = document.getElementById("remoteSDP");
+	// if (remoteSDP) {
+	// 	remoteSDP.addEventListener("input", function () {
+	// 		const val = this.value.trim();
+	// 		const sdp = window.parseSDPChunk(val);
+	// 		if (sdp) {
+	// 			this.value = sdp;
+	// 		}
+	// 	});
+	// }
 });
