@@ -30,4 +30,24 @@ window.addEventListener("DOMContentLoaded", () => {
 	if (setRemoteBtn) {
 		setRemoteBtn.onclick = window.setRemoteDescription;
 	}
+
+	// SDP navigation
+	const sdpPrev = document.getElementById("sdpPrev");
+	const sdpNext = document.getElementById("sdpNext");
+	if (sdpPrev)
+		sdpPrev.onclick = () => window.showPrevSDP && window.showPrevSDP();
+	if (sdpNext)
+		sdpNext.onclick = () => window.showNextSDP && window.showNextSDP();
+
+	// Accept chunked or full SDP in remoteSDP
+	const remoteSDP = document.getElementById("remoteSDP");
+	if (remoteSDP) {
+		remoteSDP.addEventListener("input", function () {
+			const val = this.value.trim();
+			const sdp = window.parseSDPChunk(val);
+			if (sdp) {
+				this.value = sdp;
+			}
+		});
+	}
 });

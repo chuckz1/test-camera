@@ -21,6 +21,12 @@
 	<hr>
 	<h2>WebRTC</h2>
 	<button id="startWebRTC">Start WebRTC</button>
+
+	<div id="sdpNav" style="display:none; margin:10px 0;">
+		<button id="sdpPrev">Prev</button>
+		<span id="sdpIndex"></span>
+		<button id="sdpNext">Next</button>
+	</div>
 	<div style="margin:10px 0;">
 		<label for="localSDP">Your Offer/Answer:</label><br>
 		<textarea id="localSDP" rows="6" cols="60" readonly></textarea>
@@ -30,8 +36,11 @@
 		<textarea id="remoteSDP" rows="6" cols="60"></textarea>
 		<br>
 		<button id="setRemoteSDP">Set Remote Description</button>
+		<div id="chunkInfo" style="margin-top:5px;color:#ff0;"></div>
 	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 	<script src="camera.js"></script>
+	<script src="compression.js"></script>
 	<script src="webrtc.js"></script>
 	<script src="main.js"></script>
 </body>
