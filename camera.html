@@ -4,112 +4,21 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Arducam USB Camera Viewer</title>
-	<link rel="manifest" href="manifest.json">
-	<meta name="theme-color" content="#222">
-	<link rel="apple-touch-icon" href="icon-192.png">
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			background: #222;
-			color: #fff;
-			text-align: center;
-		}
-
-		video {
-			margin-top: 20px;
-			width: 80vw;
-			max-width: 800px;
-			border: 2px solid #444;
-			border-radius: 8px;
-			background: #000;
-		}
-
-		button {
-			margin-top: 20px;
-			padding: 10px 20px;
-			font-size: 1rem;
-		}
-	</style>
+	<title>Simple Camera Viewer</title>
+	<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-	<h1>Arducam USB Camera Viewer</h1>
-	<label for="cameraSelect">Select Camera:</label>
-	<select id="cameraSelect"></select>
+	<h1>Camera Viewer</h1>
+	<div style="margin-bottom:20px;">
+		<label for="cameraSelect">Select Camera:</label>
+		<select id="cameraSelect"></select>
+		<button id="refreshCameras">Refresh Cameras</button>
+	</div>
+	<video id="video" autoplay playsinline style="width: 640px; max-width: 100%;"></video>
 	<br>
-	<video id="video" autoplay playsinline></video>
-	<br>
-	<button onclick="startCamera()">Start Camera</button>
-	<script>
-		let currentStream;
-
-		async function getCameras() {
-			console.log('Getting camera devices...');
-			try {
-				const devices = await navigator.mediaDevices.enumerateDevices();
-				console.log('All devices:', devices);
-				const videoDevices = devices.filter(device => device.kind === 'videoinput');
-				console.log('Video devices:', videoDevices);
-				const select = document.getElementById('cameraSelect');
-				select.innerHTML = '';
-				videoDevices.forEach((device, i) => {
-					const option = document.createElement('option');
-					option.value = device.deviceId;
-					option.text = device.label || `Camera ${i + 1}`;
-					select.appendChild(option);
-					console.log(`Added camera option: ${option.text} (${option.value})`);
-				});
-				if (videoDevices.length === 0) {
-					const option = document.createElement('option');
-					option.text = 'No cameras found';
-					select.appendChild(option);
-					console.warn('No video input devices found.');
-				}
-			} catch (err) {
-				console.error('Error getting cameras:', err);
-			}
-		}
-
-		async function startCamera() {
-			const select = document.getElementById('cameraSelect');
-			const deviceId = select.value;
-			console.log('Selected deviceId:', deviceId);
-			const constraints = {
-				video: {
-					deviceId: deviceId ? { exact: deviceId } : undefined,
-					width: { ideal: 1920 },
-					height: { ideal: 1080 }
-				}
-			};
-			console.log('Requesting getUserMedia with constraints:', constraints);
-			try {
-				if (currentStream) {
-					currentStream.getTracks().forEach(track => track.stop());
-					console.log('Stopped previous stream.');
-				}
-				const stream = await navigator.mediaDevices.getUserMedia(constraints);
-				currentStream = stream;
-				document.getElementById('video').srcObject = stream;
-				console.log('Camera stream started.');
-			} catch (err) {
-				console.error('Error accessing camera:', err);
-				alert('Error accessing camera: ' + err.message);
-			}
-		}
-
-		// Populate camera list on load
-		getCameras();
-		// Update camera list if devices change
-		navigator.mediaDevices.addEventListener('devicechange', getCameras);
-
-		// Register service worker for PWA
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('service-worker.js')
-				.then(reg => console.log('Service worker registered:', reg))
-				.catch(err => console.error('Service worker registration failed:', err));
-		}
-	</script>
+	<button id="startCamera">Start Camera</button>
+	<script src="camera.js"></script>
 </body>
 
 </html>
